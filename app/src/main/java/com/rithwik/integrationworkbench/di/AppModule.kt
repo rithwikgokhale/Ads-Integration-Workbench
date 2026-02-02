@@ -17,6 +17,7 @@ import com.rithwik.integrationworkbench.domain.repository.SettingsRepository
 import com.rithwik.integrationworkbench.domain.telemetry.TelemetryAnalyzer
 import com.rithwik.integrationworkbench.plugins.AdsIntegrationPlugin
 import com.rithwik.integrationworkbench.plugins.admob.AdMobPluginStub
+import com.rithwik.integrationworkbench.plugins.applovin.AppLovinMaxPluginStub
 import com.rithwik.integrationworkbench.plugins.mock.MockAdsPlugin
 import com.rithwik.integrationworkbench.plugins.unity.UnityAdsPluginStub
 import dagger.Binds
@@ -88,4 +89,8 @@ abstract class PluginModule {
     @Binds
     @IntoSet
     abstract fun bindUnityPlugin(plugin: UnityAdsPluginStub): AdsIntegrationPlugin
+
+    @Binds
+    @IntoSet
+    abstract fun bindAppLovinPlugin(plugin: AppLovinMaxPluginStub): AdsIntegrationPlugin
 }
