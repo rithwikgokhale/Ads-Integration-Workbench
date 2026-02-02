@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "max-integration-lab-android"
+rootProject.name = "integration-workbench-ads-android"
 include(":app")

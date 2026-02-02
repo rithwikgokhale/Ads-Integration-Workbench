@@ -10,11 +10,11 @@ plugins {
 }
 
 android {
-    namespace = "com.maxlab"
+    namespace = "com.rithwik.integrationworkbench"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.maxlab"
+        applicationId = "com.rithwik.integrationworkbench"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -49,6 +49,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {

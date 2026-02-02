@@ -1,18 +1,20 @@
-# MAX Integration Lab (Android)
+# Ads Integration Workbench (Android)
 
-This project is a production-style Android (Kotlin) sample that demonstrates a clean AppLovin MAX integration with strong debugging/observability. It is structured for Solutions Engineering workflows: fast validation, telemetry, and issue reproduction without shipping secrets.
+A production-style Android (Kotlin) workbench for testing, debugging, and validating multiple ad network integrations. This project demonstrates clean architecture, plugin-based SDK abstraction, local telemetry analysis, and comprehensive debugging/observability tools.
 
 ## What this demonstrates
-- Clean MVVM + data/domain/ui separation with Room persistence.
-- A MAX adapter layer that supports REAL and MOCK modes.
-- A structured Event pipeline for debugging and local telemetry analysis.
-- A debug bundle export flow that redacts sensitive information.
+- **Plugin System**: Extensible architecture supporting multiple ad networks (Mock, AdMob, Unity Ads, etc.)
+- **Clean MVVM + data/domain/ui separation** with Room persistence and DataStore
+- **Structured Event pipeline** for debugging and local telemetry analysis
+- **Debug bundle export** with automatic secret redaction
+- **Issue reproduction harness** with configurable guards and failure injection
+
+## Prerequisites
+- Android Studio (latest stable)
+- JDK 17
+- Android SDK with an emulator (minSdk 26) or a physical device
 
 ## Setup
-### Prerequisites
-- Android Studio (latest stable).
-- JDK 17.
-- Android SDK with an emulator (minSdk 26) or a physical device.
 
 ### Clone and open
 ```bash
@@ -21,70 +23,84 @@ cd MAX-Integration-App
 ```
 Open the project in Android Studio and let Gradle sync.
 
-### Secrets (required for REAL mode)
-1. Copy `/app/src/main/assets/secrets.template.json` to `/app/src/main/assets/secrets.json`.
-2. Paste your MAX SDK key and ad unit IDs:
-```json
-{
-  "sdkKey": "PASTE_SDK_KEY_HERE",
-  "bannerAdUnitId": "PASTE_BANNER_AD_UNIT_ID",
-  "interstitialAdUnitId": "PASTE_INTERSTITIAL_AD_UNIT_ID",
-  "rewardedAdUnitId": "PASTE_REWARDED_AD_UNIT_ID"
-}
-```
-If `secrets.json` is missing or contains placeholders, the app runs in MOCK mode and shows the setup screen.
+### Plugin Configuration
+Configure ad network credentials in the **Integrations** tab:
+1. Select a plugin (Mock, AdMob, Unity Ads)
+2. Enter App ID / SDK Key
+3. Enter Ad Unit IDs for each format
+4. Save the configuration
+
+The **Mock plugin** works without any configuration and is ideal for testing the UI and event pipeline.
 
 ### Run (Android Studio)
-1. Select an emulator or device (minSdk 26).
-2. Click **Run**.
+1. Select an emulator or device (minSdk 26)
+2. Click **Run**
 
 ### Run (CLI)
 ```bash
 ./gradlew :app:assembleDebug
 ```
-Then install the APK from Android Studio or `adb install`.
+Then install the APK via `adb install`.
 
 ## Tabs
-### Home
-Quick control panel for init, load, and show actions. Shows init status, last event, ad unit IDs (redacted), and current issue repro toggles.
+
+### Integrations
+- Configure ad network plugins (credentials, ad unit IDs)
+- Harness settings: init timeout guard, retry policy, bad config injection, offline guard, consent state
+
+### Actions
+- Select a plugin and execute actions (Initialize, Load, Show)
+- View plugin state and action results
+- Banner placeholder for mock banner display
 
 ### Debug Console
-Timeline of recent events stored in Room. Filter by category, open event details, and export a debug bundle zip.
+- Live timeline of events stored in Room
+- Filter by event type (Init/Load/Show/Error/System) and status (Success/Failure)
+- Filter by ad network
+- Tap event row for full details in bottom sheet
+- Export debug bundle (zip) with share intent
 
 ### Insights
-Local telemetry analysis computed from Room:
-- success rate by format/ad unit
-- p50/p95 latency by format
-- top errors
-- success rate drop detector (last 30 minutes vs previous 30 minutes)
+- Success rate by network/format
+- p50/p95 latency by format and network
+- Top errors grouped by code/message
+- Drop detector: flags >20% success rate drop in 30-minute window
 
-### Issue Repro
-Toggles and controls to reproduce common integration issues:
-- Init timeout guard (5s timeout + retries)
-- Bad ad unit ID injection
-- Offline guard (blocks ad loads)
-- Privacy/consent mock state
-
-## Debug bundle export
+## Debug Bundle Export
 The Debug Console exports a zip containing:
 - `events.json` (last 2000 events)
-- `app_config.json` (redacted SDK key and ad unit IDs)
+- `app_config.json` (harness settings, no secrets)
 - `device_info.json` (device/app info, network state)
 - `last_50_errors.json`
+- `plugin_config_redacted.json` (credentials and ad unit IDs redacted)
 
-All payloads are sanitized to remove full SDK key and ad unit IDs.
+All payloads are automatically sanitized to remove sensitive information.
 
-## 3–5 minute demo script
-1. Launch the app in MOCK mode (leave `secrets.json` missing).
-2. Tap **Initialize MAX** and watch the status change to Ready.
-3. Load and show Banner + Interstitial + Rewarded to generate events.
-4. Open **Debug Console**, filter to Load/Display, and open an event detail sheet.
-5. Toggle **Bad Ad Unit IDs** in Issue Repro and retry a load to create errors.
-6. Toggle **Init Timeout Guard**, re-init, and observe timeout handling + retries.
-7. Open **Insights** to review success rates and latency summaries.
-8. Export a debug bundle and share the zip.
+## Issue Reproduction Harness
+Toggle these in the **Integrations** tab:
+- **Init Timeout Guard**: 5s timeout with exponential backoff retry (1s, 2s, 4s)
+- **Init Retry**: Enable automatic retry on init timeout
+- **Bad Config Injection**: Replace ad unit IDs with invalid values
+- **Offline Guard**: Block ad operations when device is offline
+- **Simulate Load Failure**: Force load failures in mock plugin
+- **Consent State**: Set UNKNOWN / GRANTED / DENIED
+- **Age Restricted User**: Toggle COPPA flag
 
-## Build & test
+## 3–5 Minute Demo Script
+1. Launch the app
+2. Go to **Integrations** tab, select Mock plugin (no configuration needed)
+3. Go to **Actions** tab, select Mock, tap **Initialize**
+4. Tap **Load Banner**, then **Show Banner** to see placeholder
+5. Tap **Load Interstitial**, then **Show Interstitial**
+6. Go to **Debug Console**, filter by Load/Show events
+7. Tap an event to see full details
+8. Go back to **Integrations**, enable **Bad Config Injection**
+9. Go to **Actions**, try **Load Banner** again - observe failure
+10. Go to **Debug Console**, filter by Error events
+11. Go to **Insights** to see success rates and error summaries
+12. Tap **Export Bundle** to share debug data
+
+## Build & Test
 ```bash
 ./gradlew assembleDebug
 ./gradlew test
@@ -92,10 +108,19 @@ All payloads are sanitized to remove full SDK key and ad unit IDs.
 ./gradlew detekt
 ```
 
-## Troubleshooting setup
-- If Gradle fails with “Unable to locate a Java Runtime”, install JDK 17 and set `JAVA_HOME`.
-- If you only need a runnable app, skip secrets and use MOCK mode.
-- If you see init failures in REAL mode, confirm keys and complete `RealMaxAdapter`.
+## Troubleshooting
+- **Gradle wrapper failure**: If you see `NoClassDefFoundError: org/gradle/wrapper/IDownload`, re-download the gradle wrapper jar or use a local Gradle installation
+- **JDK not found**: Install JDK 17 and set `JAVA_HOME`
+- **Plugin stubs return NOT_IMPLEMENTED**: This is expected for AdMob/Unity until SDKs are wired
 
-## Notes
-Real MAX wiring is isolated inside `RealMaxAdapter` with TODOs pointing to the AppLovin MAX Android docs. The app is fully runnable with `MockMaxAdapter` when secrets are missing.
+## Architecture
+See [docs/architecture.md](docs/architecture.md) for module breakdown, data flow, and plugin system design.
+
+## Plugin Authoring
+See [docs/plugin-authoring-guide.md](docs/plugin-authoring-guide.md) for how to add new ad network plugins.
+
+## Troubleshooting Playbook
+See [docs/troubleshooting-playbook.md](docs/troubleshooting-playbook.md) for decision trees on common issues.
+
+## Data Dictionary
+See [docs/data-dictionary.md](docs/data-dictionary.md) for event schema and field definitions.
