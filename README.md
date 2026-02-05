@@ -3,7 +3,7 @@
 A production-style Android (Kotlin) workbench for testing, debugging, and validating multiple ad network integrations. This project demonstrates clean architecture, plugin-based SDK abstraction, local telemetry analysis, and comprehensive debugging/observability tools.
 
 ## What this demonstrates
-- **Plugin System**: Extensible architecture supporting multiple ad networks (Mock, AdMob, Unity Ads, etc.)
+- **Plugin System**: Extensible architecture supporting multiple ad networks (Mock, AdMob, Unity Ads, AppLovin MAX, etc.)
 - **Clean MVVM + data/domain/ui separation** with Room persistence and DataStore
 - **Structured Event pipeline** for debugging and local telemetry analysis
 - **Debug bundle export** with automatic secret redaction
@@ -25,7 +25,7 @@ Open the project in Android Studio and let Gradle sync.
 
 ### Plugin Configuration
 Configure ad network credentials in the **Integrations** tab:
-1. Select a plugin (Mock, AdMob, Unity Ads)
+1. Select a plugin (Mock, AdMob, Unity Ads, AppLovin MAX)
 2. Enter App ID / SDK Key
 3. Enter Ad Unit IDs for each format
 4. Save the configuration
@@ -111,7 +111,7 @@ Toggle these in the **Integrations** tab:
 ## Troubleshooting
 - **Gradle wrapper failure**: If you see `NoClassDefFoundError: org/gradle/wrapper/IDownload`, re-download the gradle wrapper jar or use a local Gradle installation
 - **JDK not found**: Install JDK 17 and set `JAVA_HOME`
-- **Plugin stubs return NOT_IMPLEMENTED**: This is expected for AdMob/Unity until SDKs are wired
+- **Plugin stubs return NOT_IMPLEMENTED**: This is expected for AdMob/Unity/AppLovin until SDKs are wired
 
 ## Architecture
 See [docs/architecture.md](docs/architecture.md) for module breakdown, data flow, and plugin system design.
