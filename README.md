@@ -18,8 +18,8 @@ A production-style Android (Kotlin) workbench for testing, debugging, and valida
 
 ### Clone and open
 ```bash
-git clone https://github.com/rithwikgokhale/MAX-Integration-App.git
-cd MAX-Integration-App
+git clone https://github.com/rithwikgokhale/Ads-Integration-Workbench.git
+cd Ads-Integration-Workbench
 ```
 Open the project in Android Studio and let Gradle sync.
 
